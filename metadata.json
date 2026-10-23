@@ -1,0 +1,6 @@
+{
+  "name": "SmartKho - Quản Lý Kho Giày Dép adidas",
+  "description": "Hệ thống quản lý kho giày dép thông minh tích hợp dữ liệu adidas Vietnam (Samba, Gazelle, Ultraboost, Stan Smith...), báo cáo tự động, cảnh báo tồn kho và xuất Excel kiểm kê.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
