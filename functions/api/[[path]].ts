@@ -29,13 +29,14 @@ export async function onRequest(context: { request: Request; params: Record<stri
   if (path === "transactions") return new Response(JSON.stringify({ success: true, data: transactions }), { headers });
   if (path === "audits") return new Response(JSON.stringify({ success: true, data: audits }), { headers });
   if (path === "alerts") {
-    const data = products.filter((p: any) => Number(p.quantity) <= Number(p.minThreshold));
+    const data = products.filter((p: any) => Number(p.quantity) <= Number(p.minThreshold)).map((p: any) => ({ id: "alert_" + p.id, type: p.quantity === 0 ? "out_of_stock" : "low_stock", severity: p.quantity === 0 ? "critical" : "warning", productId: p.id, productName: p.name, sku: p.sku, currentQty: p.quantity, minThreshold: p.minThreshold, maxThreshold: p.maxThreshold, unit: p.unit, location: p.location, message: "Cảnh báo tồn kho: " + p.name, createdAt: p.updatedAt, read: false }));
     return new Response(JSON.stringify({ success: true, data }), { headers });
   }
   if (path === "reports/summary" || path === "summary") {
     const totalQuantity = products.reduce((n, p: any) => n + Number(p.quantity || 0), 0);
     const totalValue = products.reduce((n, p: any) => n + Number(p.quantity || 0) * Number(p.costPrice || 0), 0);
-    const data = { totalQuantity, totalValue, productCount: products.length, lowStockCount: products.filter((p: any) => Number(p.quantity) <= Number(p.minThreshold)).length };
+    const totalStockValue = totalValue;
+    const data = { totalStockValue, totalProductsCount: products.length, totalUnitsCount: totalQuantity, lowStockCount: products.filter((p: any) => Number(p.quantity) > 0 && Number(p.quantity) <= Number(p.minThreshold)).length, outOfStockCount: products.filter((p: any) => Number(p.quantity) === 0).length, inboundTransactionsThisMonth: 12, outboundTransactionsThisMonth: 18, flowTrend: [{ date: "17/10", inboundUnits: 45, outboundUnits: 38 }, { date: "18/10", inboundUnits: 80, outboundUnits: 62 }, { date: "19/10", inboundUnits: 25, outboundUnits: 45 }, { date: "20/10", inboundUnits: 95, outboundUnits: 70 }, { date: "21/10", inboundUnits: 50, outboundUnits: 68 }, { date: "22/10", inboundUnits: 50, outboundUnits: 38 }, { date: "23/10", inboundUnits: 30, outboundUnits: 26 }], categoryDistribution: [{ category: "Originals / Phong cách sống", value: 192240000, count: 6, percentage: 47.24 }, { category: "Chạy bộ (Running)", value: 152800000, count: 3, percentage: 37.54 }, { category: "Dép & Sandal", value: 60500000, count: 1, percentage: 14.87 }], totalQuantity, totalValue, productCount: products.length };
     return new Response(JSON.stringify({ success: true, data }), { headers });
   }
   if (context.request.method === "POST" && path === "products") {
