@@ -13,12 +13,77 @@ const products: Product[] = [
   { id: "prod_shoe_010", sku: "AP9971-42", barcode: "4066748231103", name: "Dép adidas Adilette Aqua Black (Size 42)", category: "Dép & Sandal", unit: "Đôi", location: "Kệ C1 - Adilette", quantity: 110, minThreshold: 25, maxThreshold: 200, costPrice: 550000, sellingPrice: 950000, supplier: "adidas Vietnam Logistics Ltd.", imageUrl: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=600&auto=format&fit=crop&q=80", updatedAt: "2026-10-15 08:20", status: "in_stock" }
 ];
 
-const transactions = [
-  { id: "tx_001", type: "in", productId: "prod_shoe_001", quantity: 30, date: "2026-10-23", note: "Nhập bổ sung demo" },
-  { id: "tx_002", type: "out", productId: "prod_shoe_003", quantity: 12, date: "2026-10-22", note: "Xuất đại lý demo" },
-  { id: "tx_003", type: "in", productId: "prod_shoe_004", quantity: 20, date: "2026-10-21", note: "Nhập kho demo" }
+const product = (id: string) => products.find((item) => item.id === id) as any;
+
+let transactions = [
+  {
+    id: "tx_001",
+    code: "PNK-2026-DEMO-01",
+    type: "inbound",
+    date: "2026-10-23 09:30",
+    partner: "adidas Vietnam Logistics Ltd.",
+    reason: "Nhập bổ sung demo",
+    items: [{ productId: "prod_shoe_001", productName: product("prod_shoe_001").name, sku: product("prod_shoe_001").sku, barcode: product("prod_shoe_001").barcode, quantity: 30, unitPrice: product("prod_shoe_001").costPrice, total: 30 * product("prod_shoe_001").costPrice, unit: product("prod_shoe_001").unit, location: product("prod_shoe_001").location }],
+    totalAmount: 30 * product("prod_shoe_001").costPrice,
+    creator: { id: "usr_staff", name: "Lê Hoàng Nam", role: "Thủ kho" },
+    approver: { id: "usr_manager", name: "Trần Thị Mai", approvedAt: "2026-10-23 10:00" },
+    status: "completed",
+    note: "Phiếu demo để kiểm thử quy trình nhập kho",
+    warehouse: "Kho Tổng Giày adidas Vietnam",
+  },
+  {
+    id: "tx_002",
+    code: "PXK-2026-DEMO-02",
+    type: "outbound",
+    date: "2026-10-22 15:00",
+    partner: "Cửa hàng adidas Flagship Store",
+    reason: "Xuất đại lý demo",
+    items: [{ productId: "prod_shoe_003", productName: product("prod_shoe_003").name, sku: product("prod_shoe_003").sku, barcode: product("prod_shoe_003").barcode, quantity: 12, unitPrice: product("prod_shoe_003").sellingPrice, total: 12 * product("prod_shoe_003").sellingPrice, unit: product("prod_shoe_003").unit, location: product("prod_shoe_003").location }],
+    totalAmount: 12 * product("prod_shoe_003").sellingPrice,
+    creator: { id: "usr_staff", name: "Lê Hoàng Nam", role: "Thủ kho" },
+    approver: { id: "usr_manager", name: "Trần Thị Mai", approvedAt: "2026-10-22 15:30" },
+    status: "completed",
+    note: "Phiếu demo để kiểm thử quy trình xuất kho",
+    warehouse: "Kho Tổng Giày adidas Vietnam",
+  },
+  {
+    id: "tx_003",
+    code: "PNK-2026-DEMO-03",
+    type: "inbound",
+    date: "2026-10-21 10:00",
+    partner: "adidas Performance Southeast Asia",
+    reason: "Nhập kho demo",
+    items: [{ productId: "prod_shoe_004", productName: product("prod_shoe_004").name, sku: product("prod_shoe_004").sku, barcode: product("prod_shoe_004").barcode, quantity: 20, unitPrice: product("prod_shoe_004").costPrice, total: 20 * product("prod_shoe_004").costPrice, unit: product("prod_shoe_004").unit, location: product("prod_shoe_004").location }],
+    totalAmount: 20 * product("prod_shoe_004").costPrice,
+    creator: { id: "usr_staff", name: "Lê Hoàng Nam", role: "Thủ kho" },
+    status: "pending_approval",
+    note: "Phiếu demo đang chờ quản lý phê duyệt",
+    warehouse: "Kho Tổng Giày adidas Vietnam",
+  },
 ];
-const audits = [{ id: "audit_001", date: "2026-10-23", status: "completed", note: "Kiểm kê mẫu" }];
+
+let audits = [
+  {
+    id: "audit_001",
+    code: "KK-GIÀY-2026-DEMO",
+    title: "Kiểm kê mẫu tháng 10/2026",
+    warehouse: "Kho Tổng Giày adidas Vietnam",
+    createdAt: "2026-10-23 08:00",
+    completedAt: "2026-10-23 17:30",
+    status: "completed",
+    auditorName: "Phạm Đức Minh (Kiểm toán độc lập)",
+    notes: "Đợt kiểm kê demo có sẵn để thử xuất Excel",
+    items: [
+      { productId: "prod_shoe_001", sku: product("prod_shoe_001").sku, productName: product("prod_shoe_001").name, unit: product("prod_shoe_001").unit, location: product("prod_shoe_001").location, category: product("prod_shoe_001").category, systemQty: 24, actualQty: 24, difference: 0, unitCost: product("prod_shoe_001").costPrice, differenceValue: 0, reason: "Khớp tồn kho", status: "matched" },
+      { productId: "prod_shoe_009", sku: product("prod_shoe_009").sku, productName: product("prod_shoe_009").name, unit: product("prod_shoe_009").unit, location: product("prod_shoe_009").location, category: product("prod_shoe_009").category, systemQty: 2, actualQty: 1, difference: -1, unitCost: product("prod_shoe_009").costPrice, differenceValue: -product("prod_shoe_009").costPrice, reason: "Một đôi đang trưng bày", status: "shortage" },
+      { productId: "prod_shoe_010", sku: product("prod_shoe_010").sku, productName: product("prod_shoe_010").name, unit: product("prod_shoe_010").unit, location: product("prod_shoe_010").location, category: product("prod_shoe_010").category, systemQty: 110, actualQty: 110, difference: 0, unitCost: product("prod_shoe_010").costPrice, differenceValue: 0, reason: "Khớp tồn kho", status: "matched" },
+    ],
+    totalSystemQty: 136,
+    totalActualQty: 135,
+    totalDifferenceQty: -1,
+    totalDifferenceValue: -product("prod_shoe_009").costPrice,
+  },
+];
 
 export async function onRequest(context: { request: Request; params: Record<string, string | string[]> }) {
   const raw = context.params?.path;
@@ -38,6 +103,18 @@ export async function onRequest(context: { request: Request; params: Record<stri
     const totalStockValue = totalValue;
     const data = { totalStockValue, totalProductsCount: products.length, totalUnitsCount: totalQuantity, lowStockCount: products.filter((p: any) => Number(p.quantity) > 0 && Number(p.quantity) <= Number(p.minThreshold)).length, outOfStockCount: products.filter((p: any) => Number(p.quantity) === 0).length, inboundTransactionsThisMonth: 12, outboundTransactionsThisMonth: 18, flowTrend: [{ date: "17/10", inboundUnits: 45, outboundUnits: 38 }, { date: "18/10", inboundUnits: 80, outboundUnits: 62 }, { date: "19/10", inboundUnits: 25, outboundUnits: 45 }, { date: "20/10", inboundUnits: 95, outboundUnits: 70 }, { date: "21/10", inboundUnits: 50, outboundUnits: 68 }, { date: "22/10", inboundUnits: 50, outboundUnits: 38 }, { date: "23/10", inboundUnits: 30, outboundUnits: 26 }], categoryDistribution: [{ category: "Originals / Phong cách sống", value: 192240000, count: 6, percentage: 47.24 }, { category: "Chạy bộ (Running)", value: 152800000, count: 3, percentage: 37.54 }, { category: "Dép & Sandal", value: 60500000, count: 1, percentage: 14.87 }], totalQuantity, totalValue, productCount: products.length };
     return new Response(JSON.stringify({ success: true, data }), { headers });
+  }
+  if (context.request.method === "POST" && path === "transactions") {
+    const body = await context.request.json() as any;
+    const record: any = { id: `tx_${Date.now()}`, code: `${body.type === "inbound" ? "PNK" : "PXK"}-2026-DEMO-${transactions.length + 1}`, type: body.type || "inbound", date: new Date().toISOString().slice(0, 16).replace("T", " "), partner: body.partner || "Đối tác demo", reason: body.reason || "Giao dịch demo", items: body.items || [], totalAmount: (body.items || []).reduce((sum: number, item: any) => sum + Number(item.quantity || 0) * Number(item.unitPrice || 0), 0), creator: body.creator || { id: "usr_admin", name: "Nguyễn Văn An", role: "Quản trị viên" }, status: "pending_approval", warehouse: body.warehouse || "Kho Tổng Giày adidas Vietnam", note: body.note || "" };
+    transactions.unshift(record);
+    return new Response(JSON.stringify({ success: true, data: record }), { status: 201, headers });
+  }
+  if (context.request.method === "POST" && path === "audits") {
+    const body = await context.request.json() as any;
+    const record: any = { id: `audit_${Date.now()}`, code: `KK-GIÀY-2026-${audits.length + 1}`, title: body.title || "Kiểm kê mới", warehouse: body.warehouse || "Kho Tổng Giày adidas Vietnam", createdAt: new Date().toISOString().slice(0, 16).replace("T", " "), status: "in_progress", auditorName: body.auditorName || "Nguyễn Văn An", notes: "Đợt kiểm kê mới", items: products.map((item: any) => ({ productId: item.id, sku: item.sku, productName: item.name, unit: item.unit, location: item.location, category: item.category, systemQty: Number(item.quantity), actualQty: null, difference: 0, unitCost: Number(item.costPrice), differenceValue: 0, status: "pending" })), totalSystemQty: products.reduce((sum: number, item: any) => sum + Number(item.quantity), 0), totalActualQty: 0, totalDifferenceQty: 0, totalDifferenceValue: 0 };
+    audits.unshift(record);
+    return new Response(JSON.stringify({ success: true, data: record }), { status: 201, headers });
   }
   if (context.request.method === "POST" && path === "products") {
     const body = await context.request.json();
